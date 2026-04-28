@@ -9,17 +9,20 @@ def enableLTO = providers.gradleProperty("enableLTO")
 android {
     namespace = 'io.github.vvb2060.ndk.boringssl'
     defaultConfig {
+        ndk {
+            abiFilters += [ "x86", "x86_64", "armeabi-v7a", "arm64-v8a", "riscv64" ]
+        }
         externalNativeBuild {
-            ndkBuild {
-                arguments += [ "-j${Runtime.runtime.availableProcessors()}" ]
-                if (enableLTO.present) arguments += [ "enableLTO=1" ]
-                abiFilters += [ "x86", "x86_64", "armeabi-v7a", "arm64-v8a", "riscv64" ]
+            cmake {
+                arguments += [ "-DANDROID_STL=c++_static" ]
+                if (enableLTO.present) arguments += [ "-DENABLE_LTO=ON" ]
+                targets += [ "crypto_static", "ssl_static" ]
             }
         }
     }
 
     externalNativeBuild {
-        ndkBuild.path 'src/main/native/BoringSSL.mk'
+        cmake.path 'src/main/native/CMakeLists.txt'
     }
 
     compileOptions {

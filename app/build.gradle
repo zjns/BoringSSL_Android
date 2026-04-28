@@ -11,8 +11,9 @@ android {
         versionName = '20251124'
         testInstrumentationRunner = 'androidx.test.runner.AndroidJUnitRunner'
         externalNativeBuild {
-            ndkBuild {
-                arguments += [ "-j${Runtime.runtime.availableProcessors()}" ]
+            cmake {
+                arguments += [ "-DANDROID_STL=c++_static" ]
+                targets += [ "bssl", "crypto_test", "ssl_test" ]
             }
         }
         ndk {
@@ -28,16 +29,16 @@ android {
             signingConfig = signingConfigs.debug
             proguardFiles("proguard-rules.pro")
             externalNativeBuild {
-                ndkBuild {
-                    arguments += [ "enableLTO=1" ]
+                cmake {
+                    arguments += [ "-DENABLE_LTO=ON" ]
                 }
             }
         }
     }
 
     externalNativeBuild {
-        ndkBuild {
-            path file('../boringssl/src/main/native/Android.mk')
+        cmake {
+            path file('../boringssl/src/main/native/CMakeLists.txt')
         }
     }
 
